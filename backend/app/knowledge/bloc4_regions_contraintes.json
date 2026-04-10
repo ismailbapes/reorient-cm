@@ -1,0 +1,180 @@
+{
+  "regions": [
+    {
+      "id": "littoral",
+      "nom": "Littoral",
+      "chef_lieu": "Douala",
+      "villes_principales": ["Douala", "Nkongsamba", "Edéa"],
+      "indice_opportunite": 95,
+      "niveau_marche": "fort",
+      "secteurs_porteurs": ["telecom_numerique", "btp_genie_civil", "banque_microfinance", "agro_industrie", "petrole_mines"],
+      "employeurs_majeurs": ["Bolloré Africa Logistics", "Total Energies", "Nestlé Cameroun", "MTN Cameroun", "Orange Cameroun", "Guinness Cameroun GUCAM", "SABC", "Dan Gote Cement", "CICAM", "CAMRAIL", "Afriland First Bank", "UBA Cameroun", "Ecobank", "PERENCO", "SCDP"],
+      "contrainte_specifique": "Coût de la vie élevé pour les nouveaux arrivants",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "centre",
+      "nom": "Centre",
+      "chef_lieu": "Yaoundé",
+      "villes_principales": ["Yaoundé", "Mbalmayo", "Bafia"],
+      "indice_opportunite": 88,
+      "niveau_marche": "fort",
+      "secteurs_porteurs": ["education_formation", "telecom_numerique", "banque_microfinance", "sante_pharmacie"],
+      "employeurs_majeurs": ["Ministères et administrations", "GIZ", "AFD", "PNUD", "UNICEF", "MTN Cameroun", "Orange Cameroun", "Universités privées", "ONU Femmes"],
+      "contrainte_specifique": "Marché très concurrentiel, réseau professionnel essentiel",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "ouest",
+      "nom": "Ouest",
+      "chef_lieu": "Bafoussam",
+      "villes_principales": ["Bafoussam", "Dschang", "Foumban"],
+      "indice_opportunite": 68,
+      "niveau_marche": "moyen",
+      "secteurs_porteurs": ["commerce_negoce", "agriculture_maraichage", "education_formation", "banque_microfinance"],
+      "employeurs_majeurs": ["PME familiales", "Microfinances locales", "Universités privées"],
+      "contrainte_specifique": "Forte culture Bamiléké — réseau tontines comme levier de financement",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "sud_ouest",
+      "nom": "Sud-Ouest",
+      "chef_lieu": "Buea",
+      "villes_principales": ["Buea", "Limbe", "Kumba"],
+      "indice_opportunite": 58,
+      "niveau_marche": "emergent",
+      "secteurs_porteurs": ["telecom_numerique", "petrole_mines", "agro_industrie"],
+      "employeurs_majeurs": ["ActivSpaces", "Silicon Mountain startups", "CDC"],
+      "contrainte_specifique": "Crise anglophone — orienter vers travail à distance en priorité",
+      "risque_securitaire": true,
+      "travail_distance_prioritaire": true
+    },
+    {
+      "id": "nord_ouest",
+      "nom": "Nord-Ouest",
+      "chef_lieu": "Bamenda",
+      "villes_principales": ["Bamenda", "Kumbo"],
+      "indice_opportunite": 42,
+      "niveau_marche": "moyen",
+      "secteurs_porteurs": ["agriculture_maraichage", "education_formation"],
+      "employeurs_majeurs": ["Écoles privées anglophones", "Coopératives agricoles"],
+      "contrainte_specifique": "Crise sécuritaire — travail à distance fortement recommandé",
+      "risque_securitaire": true,
+      "travail_distance_prioritaire": true
+    },
+    {
+      "id": "extreme_nord",
+      "nom": "Extrême-Nord",
+      "chef_lieu": "Maroua",
+      "villes_principales": ["Maroua", "Kousseri", "Mora"],
+      "indice_opportunite": 35,
+      "niveau_marche": "faible",
+      "secteurs_porteurs": ["sante_pharmacie", "agriculture_maraichage", "education_formation"],
+      "employeurs_majeurs": ["MSF", "ACF", "IRC", "INTERSOS", "UNICEF"],
+      "contrainte_specifique": "Insécurité Boko Haram — ONG principales sources d'emploi formel",
+      "risque_securitaire": true,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "nord",
+      "nom": "Nord",
+      "chef_lieu": "Garoua",
+      "villes_principales": ["Garoua", "Guider", "Figuil"],
+      "indice_opportunite": 32,
+      "niveau_marche": "faible",
+      "secteurs_porteurs": ["agro_industrie", "commerce_negoce", "education_formation"],
+      "employeurs_majeurs": ["SODECOTON", "Administrations locales"],
+      "contrainte_specifique": "Marché formel très limité — SODECOTON premier employeur",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "adamaoua",
+      "nom": "Adamaoua",
+      "chef_lieu": "Ngaoundéré",
+      "villes_principales": ["Ngaoundéré", "Meiganga", "Tibati"],
+      "indice_opportunite": 50,
+      "niveau_marche": "moyen",
+      "secteurs_porteurs": ["agro_industrie", "commerce_negoce", "education_formation"],
+      "employeurs_majeurs": ["Université de Ngaoundéré", "CAMRAIL", "Éleveurs structurés"],
+      "contrainte_specifique": "Nœud ferroviaire — logistique et commerce avec Tchad/RCA",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false
+    },
+    {
+      "id": "est",
+      "nom": "Est",
+      "chef_lieu": "Bertoua",
+      "villes_principales": ["Bertoua", "Abong-Mbang", "Batouri"],
+      "indice_opportunite": 30,
+      "niveau_marche": "faible",
+      "secteurs_porteurs": ["agro_industrie", "sante_pharmacie"],
+      "employeurs_majeurs": ["HCR", "IRC", "Sociétés forestières ROUGIER"],
+      "contrainte_specifique": "Tissu économique formel très mince — ONG humanitaires et forestiers",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": true
+    },
+    {
+      "id": "sud",
+      "nom": "Sud",
+      "chef_lieu": "Ebolowa",
+      "villes_principales": ["Ebolowa", "Kribi", "Sangmélima"],
+      "indice_opportunite": 65,
+      "niveau_marche": "moyen_emergent",
+      "secteurs_porteurs": ["btp_genie_civil", "agro_industrie", "education_formation"],
+      "employeurs_majeurs": ["Port Autonome de Kribi PAK", "Africa Global Logistics", "Arise IIP", "SODIPRACO", "Atlantic Cocoa", "SINOHYDRO"],
+      "contrainte_specifique": "Kribi en explosion économique — ZIPK vise 150 000 emplois. Corridor Yaoundé-Ebolowa 2h30.",
+      "risque_securitaire": false,
+      "travail_distance_prioritaire": false,
+      "note_kribi": "Kribi est devenu le 1er terminal à conteneurs du Cameroun (2025). Zone industrielle 4000 ha en développement."
+    }
+  ],
+  "contraintes": [
+    {
+      "id": "budget_nul",
+      "type": "financiere",
+      "signaux": ["pas d'argent", "je n'ai pas les moyens", "gratuit", "pas d'ordinateur", "connexion instable"],
+      "solutions_prioritaires": ["freeCodeCamp", "Google Digital Garage", "Orange Digital Center", "Meta Blueprint", "I am Beezy"],
+      "solutions_a_exclure": ["formations payantes", "relocation coûteuse"]
+    },
+    {
+      "id": "pression_familiale",
+      "type": "sociale",
+      "signaux": ["ma famille compte sur moi", "personnes à charge", "je dois trouver rapidement", "je ne peux pas attendre"],
+      "solutions_prioritaires": ["revenu_immediat_tutorat", "freelance_immediat", "commerce_informel"],
+      "solutions_a_exclure": ["formation_longue_sans_revenu"]
+    },
+    {
+      "id": "eloignement_geographique",
+      "type": "geographique",
+      "signaux": ["je ne peux pas me déplacer", "il n'y a rien ici", "loin de Yaoundé", "loin de Douala"],
+      "solutions_prioritaires": ["freelance_en_ligne", "agriculture_locale", "tutorat_local"],
+      "solutions_a_exclure": ["formations uniquement en présentiel Yaoundé/Douala"]
+    },
+    {
+      "id": "decouragement",
+      "type": "psychologique",
+      "signaux": ["ça fait longtemps", "mon diplôme ne sert à rien", "j'ai déjà essayé", "j'en ai marre", "je ne sais plus quoi faire"],
+      "action_speciale": "citer_cas_inspiration",
+      "solutions_prioritaires": ["action_immediate_simple", "revenu_rapide_tutorat"],
+      "solutions_a_exclure": ["plan_ambitieux_long_terme_sans_etape_courte"]
+    },
+    {
+      "id": "reseau_inexistant",
+      "type": "sociale",
+      "signaux": ["je n'ai pas de contacts", "pas de piston", "je ne connais personne", "on ne répond jamais"],
+      "solutions_prioritaires": ["fne_ped_ci", "candidature_spontanee", "groupes_whatsapp_pro", "linkedin_optimise"],
+      "solutions_a_exclure": []
+    },
+    {
+      "id": "pas_ordinateur",
+      "type": "technique",
+      "signaux": ["pas d'ordinateur", "seulement un téléphone", "smartphone", "pas d'accès internet stable"],
+      "solutions_prioritaires": ["formations_mobile", "orange_digital_center", "sololearn", "canva_mobile"],
+      "solutions_a_exclure": ["formations nécessitant un PC", "développement web complexe sans PC"]
+    }
+  ]
+}

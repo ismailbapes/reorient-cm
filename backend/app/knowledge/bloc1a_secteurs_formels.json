@@ -1,0 +1,98 @@
+[
+  {
+    "id": "telecom_numerique",
+    "secteur": "Télécommunications et numérique",
+    "demande": "haute",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Développeur web/mobile", "Technicien réseau", "Administrateur systèmes", "Data analyst", "Cybersécurité", "Chef de projet IT", "Support technique"],
+    "competences_cles": ["Python", "JavaScript", "React", "Cisco", "Linux", "SQL", "Gestion de projet"],
+    "acteurs_cameroun": ["MTN", "Orange Cameroun", "Camtel", "Nexttel", "Windigitech", "GAIA SARL", "RHOPEN Labs"],
+    "regions_principales": ["Yaoundé", "Douala", "Buea"],
+    "acces_informel": true,
+    "notes_contexte": "Croissance forte avec la politique Digital Cameroon. Nombreux postes en freelance via Fiverr et Upwork."
+  },
+  {
+    "id": "btp_genie_civil",
+    "secteur": "BTP et génie civil",
+    "demande": "haute",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Ingénieur génie civil", "Conducteur de travaux", "Dessinateur AutoCAD", "Métreur", "Technicien topographe", "Chef de chantier"],
+    "competences_cles": ["AutoCAD", "ArchiCAD", "Lecture de plans", "Gestion de chantier", "Normes MINTP", "Devis/métrés"],
+    "acteurs_cameroun": ["Razel", "China Civil Engineering", "SOGEA-SATOM", "Port Autonome de Kribi", "ZIPK"],
+    "regions_principales": ["Douala", "Yaoundé", "Kribi"],
+    "acces_informel": true,
+    "notes_contexte": "Porté par les grands chantiers publics et le boom de Kribi (150 000 emplois projetés dans la ZIPK)."
+  },
+  {
+    "id": "banque_microfinance",
+    "secteur": "Banque, microfinance et assurance",
+    "demande": "haute",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Chargé de clientèle", "Agent de crédit", "Comptable", "Auditeur interne", "Analyste financier", "Caissier", "Gestionnaire de risques"],
+    "competences_cles": ["Comptabilité OHADA", "SYSCOHADA révisé", "Excel avancé", "Analyse de crédit", "Relation client"],
+    "acteurs_cameroun": ["Afriland First Bank", "SCB", "BICEC", "UBA Cameroun", "Ecobank", "BGFIBank", "Crédit du Sahel"],
+    "regions_principales": ["Douala", "Yaoundé"],
+    "acces_informel": false,
+    "notes_contexte": "Certification COBAC souvent exigée pour les postes seniors. Secteur bancaire en forte dynamique digitale en 2026."
+  },
+  {
+    "id": "agro_industrie",
+    "secteur": "Agro-industrie et agroalimentaire",
+    "demande": "haute",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Agronome", "Technicien agricole", "Contrôleur qualité", "Responsable logistique", "Commercial export", "Ingénieur agroalimentaire"],
+    "competences_cles": ["Agronomie tropicale", "Normes HACCP", "Chaîne du froid", "Gestion de stock", "Certifications bio"],
+    "acteurs_cameroun": ["CDC", "SOCAPALM", "SODECOTON", "Nestlé Cameroun", "SOSUCAM", "JOGOO Agriculture", "Atlantic Cocoa"],
+    "regions_principales": ["Douala", "Yaoundé", "Nord", "Sud"],
+    "acces_informel": true,
+    "notes_contexte": "Pilier de l'économie camerounaise. Plan gouvernemental 2024-2026 de 1 500 milliards FCFA pour booster la transformation locale."
+  },
+  {
+    "id": "sante_pharmacie",
+    "secteur": "Santé et pharmacie",
+    "demande": "moderee",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Infirmier/sage-femme", "Laborantin", "Pharmacien", "Gestionnaire hospitalier", "Technicien biomédical"],
+    "competences_cles": ["Soins cliniques", "Gestion pharmacie", "Épidémiologie", "Logistique médicale"],
+    "acteurs_cameroun": ["Cliniques privées Yaoundé/Douala", "MSF", "UNICEF", "Plan International", "Croix-Rouge"],
+    "regions_principales": ["Yaoundé", "Douala", "Zones rurales"],
+    "acces_informel": false,
+    "notes_contexte": "Pénurie chronique en zones rurales. Opportunités ONG importantes mais peu connues."
+  },
+  {
+    "id": "education_formation",
+    "secteur": "Éducation privée et formation professionnelle",
+    "demande": "haute",
+    "stabilite_donnee": "stable",
+    "metiers": ["Enseignant/formateur", "Directeur pédagogique", "Concepteur e-learning", "Gestionnaire d'école", "Coach professionnel"],
+    "competences_cles": ["Ingénierie pédagogique", "Gestion de classe", "Outils e-learning", "Bilinguisme FR/EN"],
+    "acteurs_cameroun": ["Universités privées", "ESIGN/UIECC", "Centres de formation privés", "Orange Digital Center"],
+    "regions_principales": ["Toutes régions"],
+    "acces_informel": true,
+    "notes_contexte": "Boom des écoles privées. Fort besoin de formateurs qualifiés. Recrutement prévu de 3 500 enseignants publics en 2025-2026."
+  },
+  {
+    "id": "petrole_mines",
+    "secteur": "Pétrole, gaz et mines",
+    "demande": "moderee",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Technicien de forage", "Géologue", "HSE (sécurité)", "Ingénieur process", "Logisticien pétrolier"],
+    "competences_cles": ["Normes HSE", "Anglais technique", "Géologie pétrolière", "Certifications BOSIET"],
+    "acteurs_cameroun": ["SNH", "Total Energies", "Perenco", "SCDP"],
+    "regions_principales": ["Douala", "Littoral"],
+    "acces_informel": false,
+    "notes_contexte": "Recrutements cycliques. Anglais technique et certifications internationales quasi-obligatoires."
+  },
+  {
+    "id": "energie_renouvelable",
+    "secteur": "Énergie et énergies renouvelables",
+    "demande": "haute",
+    "stabilite_donnee": "periodique",
+    "metiers": ["Technicien électricien", "Ingénieur énergie", "Installateur solaire", "Gestionnaire mini-réseau", "HSE énergie"],
+    "competences_cles": ["Électrotechnique", "Solaire photovoltaïque", "Mini-réseaux", "Normes CEI", "Gestion de projet"],
+    "acteurs_cameroun": ["ENEO", "SINOHYDRO", "Nachtigal Hydro Power", "STECOL", "Opérateurs solaires privés"],
+    "regions_principales": ["Yaoundé", "Douala", "Zones rurales"],
+    "acces_informel": true,
+    "notes_contexte": "Secteur en forte croissance depuis la mise en service du barrage de Nachtigal (2024). Transition solaire et mini-réseaux ruraux en plein essor."
+  }
+]
