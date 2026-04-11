@@ -30,7 +30,7 @@ app.include_router(conversations.router, prefix="/api", tags=["conversations"])
 app.include_router(chat.router,          prefix="/api", tags=["chat"])
 app.include_router(plan.router,          prefix="/api", tags=["plan"])
 
-FRONTEND = Path(__file__).parent.parent / "frontend" / "index.html"
+FRONTEND = Path(__file__).parent / "frontend" / "index.html"
 
 @app.get("/health")
 async def health():
