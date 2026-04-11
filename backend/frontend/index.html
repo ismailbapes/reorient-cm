@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReOrient CM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+/* ───────── RESET & TOKENS ───────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --g:#1D9E75;--gd:#085041;--gl:#E1F5EE;--pu:#7F77DD;
+  --bg:#F4F3EF;--wh:#FFFFFF;--tx:#18181A;--mu:#6B6A68;--bo:rgba(0,0,0,.09);
+  --sb:#13191A;--sh:rgba(255,255,255,.07);--sa:rgba(255,255,255,.14);
+  --st:rgba(255,255,255,.85);--sm:rgba(255,255,255,.42);
+  --r:12px;--shadow:0 2px 16px rgba(0,0,0,.07)
+}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+input,textarea{font-family:'DM Sans',sans-serif}
+a{text-decoration:none}
+
+/* ───────── PAGES ───────── */
+.page{position:fixed;inset:0;display:none;flex-direction:column}
+.page.active{display:flex}
+#pg-land{overflow-y:auto;background:var(--bg)}
+#pg-auth{align-items:center;justify-content:center;background:var(--bg);overflow-y:auto}
+#pg-chat{flex-direction:row;overflow:hidden}
+
+/* ───────── LANDING ───────── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--wh);border-bottom:1px solid var(--bo);position:sticky;top:0;z-index:5}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--gd)}
+.logo-mark{width:34px;height:34px;background:var(--g);border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0}
+.lang-sw{display:flex;background:var(--bg);padding:3px;border-radius:8px;gap:2px}
+.lang-sw button{padding:5px 13px;border:none;background:transparent;border-radius:6px;font-size:12px;font-weight:500;color:var(--mu);transition:.15s}
+.lang-sw button.active{background:var(--wh);color:var(--gd);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:72px 24px 48px}
+.hero-pill{display:inline-flex;align-items:center;gap:7px;background:var(--gl);color:var(--gd);padding:5px 15px;border-radius:100px;font-size:12px;font-weight:600;margin-bottom:28px;letter-spacing:.01em}
+.hero-pill::before{content:'';width:6px;height:6px;background:var(--g);border-radius:50%}
+.hero h1{font-family:'Sora',sans-serif;font-size:clamp(28px,5.5vw,54px);font-weight:700;line-height:1.12;max-width:700px;margin-bottom:18px;letter-spacing:-.02em}
+.hero h1 em{color:var(--g);font-style:normal}
+.hero p{font-size:16px;color:var(--mu);max-width:500px;line-height:1.72;margin-bottom:36px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:var(--r);font-size:14px;font-weight:600;border:none;transition:.2s}
+.btn-primary{background:var(--g);color:#fff}
+.btn-primary:hover{background:var(--gd);transform:translateY(-1px);box-shadow:0 8px 24px rgba(29,158,117,.28)}
+.btn-ghost{background:transparent;color:var(--tx);border:1.5px solid var(--bo)}
+.btn-ghost:hover{border-color:var(--g);color:var(--g)}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;max-width:900px;margin:0 auto;padding:0 24px 80px}
+.fcard{background:var(--wh);border-radius:16px;padding:24px;border:1px solid var(--bo)}
+.fcard-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;margin-bottom:14px}
+.fcard h3{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;margin-bottom:5px}
+.fcard p{font-size:13px;color:var(--mu);line-height:1.6}
+
+/* ───────── AUTH ───────── */
+.auth-card{background:var(--wh);border-radius:20px;padding:40px 36px;width:min(420px,94vw);box-shadow:0 4px 40px rgba(0,0,0,.09);border:1px solid var(--bo)}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--gd);margin-bottom:28px}
+.tabs{display:flex;background:var(--bg);padding:3px;border-radius:10px;gap:2px;margin-bottom:26px}
+.tab{flex:1;padding:9px;border:none;background:transparent;border-radius:8px;font-size:13px;font-weight:500;color:var(--mu);transition:.15s}
+.tab.active{background:var(--wh);color:var(--gd);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--mu);margin-bottom:6px;letter-spacing:.01em;text-transform:uppercase}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--bo);border-radius:10px;font-size:14px;background:var(--bg);color:var(--tx);outline:none;transition:.15s}
+.field input:focus{border-color:var(--g);background:var(--wh)}
+.field input::placeholder{color:#bbb}
+.auth-btn{width:100%;padding:13px;background:var(--g);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;margin-top:4px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.auth-btn:hover{background:var(--gd)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed}
+.auth-err{background:#FFF0F0;border:1px solid #ffd0d0;color:#c0392b;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+.auth-link{text-align:center;margin-top:18px;font-size:13px;color:var(--mu)}
+.auth-link button{background:none;border:none;color:var(--g);font-weight:600;font-size:13px}
+.auth-link button:hover{text-decoration:underline}
+
+/* ───────── CHAT LAYOUT ───────── */
+.sidebar{width:260px;background:var(--sb);display:flex;flex-direction:column;flex-shrink:0;height:100%}
+.sb-top{padding:16px 14px 12px}
+.sb-brand{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:14px}
+.sb-me{background:rgba(255,255,255,.07);border-radius:9px;padding:9px 11px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sb-avatar{width:30px;height:30px;background:var(--g);border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;font-family:'Sora',sans-serif}
+.sb-me-info{min-width:0}
+.sb-name{font-size:12px;color:var(--st);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-email{font-size:11px;color:var(--sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-new-btn{width:100%;padding:10px 12px;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;text-align:left;display:flex;align-items:center;gap:8px;transition:.15s}
+.sb-new-btn:hover{background:var(--gd)}
+.sb-section{font-size:10px;font-weight:700;color:var(--sm);text-transform:uppercase;letter-spacing:.08em;padding:14px 14px 6px}
+.sb-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.sb-item{display:flex;align-items:center;border-radius:8px;margin-bottom:1px;transition:background .1s}
+.sb-item:hover{background:var(--sh)}
+.sb-item.active{background:var(--sa)}
+.sb-item-body{flex:1;padding:9px 10px;overflow:hidden;min-width:0;cursor:pointer}
+.sb-item-title{font-size:13px;color:var(--st);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.sb-item-date{font-size:11px;color:var(--sm);margin-top:2px}
+.sb-del-btn{width:28px;height:28px;border:none;background:transparent;color:var(--sm);border-radius:6px;display:none;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-right:5px;transition:.1s}
+.sb-item:hover .sb-del-btn{display:flex}
+.sb-del-btn:hover{background:rgba(220,50,50,.22);color:#ff7070}
+.sb-empty{padding:20px 14px;font-size:12px;color:var(--sm);text-align:center;line-height:1.7}
+.sb-bottom{padding:10px 14px;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:6px}
+.sb-link-btn{width:100%;padding:8px 10px;background:transparent;color:var(--sm);border:1px solid rgba(255,255,255,.11);border-radius:8px;font-size:12px;text-align:left;display:flex;align-items:center;gap:7px;transition:.15s}
+.sb-link-btn:hover{color:#fff;border-color:rgba(255,255,255,.28)}
+
+/* ───────── CHAT MAIN ───────── */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.chat-bar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;background:var(--wh);border-bottom:1px solid var(--bo);flex-shrink:0}
+.chat-bar-l{display:flex;align-items:center;gap:11px}
+.chat-conv-title{font-family:'Sora',sans-serif;font-weight:600;font-size:15px}
+.chat-status{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:5px}
+.online-dot{width:7px;height:7px;background:var(--g);border-radius:50%;animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.pdf-btn{padding:8px 16px;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;display:none;transition:.15s}
+.pdf-btn:hover{background:var(--gd)}
+.messages{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:14px}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:var(--bo);border-radius:4px}
+.empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mu);gap:12px}
+.empty-chat-icon{font-size:40px;opacity:.3}
+.empty-chat p{font-size:14px;text-align:center;max-width:280px;line-height:1.6}
+.msg-row{display:flex;gap:10px;max-width:82%;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700}
+.msg-row.assistant .msg-av{background:var(--g);color:#fff}
+.msg-row.user .msg-av{background:var(--pu);color:#fff;font-family:'Sora',sans-serif}
+.msg-bub{padding:11px 16px;border-radius:14px;font-size:13.5px;line-height:1.75;word-break:break-word}
+.msg-row.assistant .msg-bub{background:var(--wh);border:1px solid var(--bo);border-bottom-left-radius:3px}
+.msg-row.user .msg-bub{background:var(--g);color:#fff;border-bottom-right-radius:3px}
+.msg-bub strong{font-weight:700}
+.typing-row{display:none;align-items:center;gap:10px;padding:0 20px;flex-shrink:0}
+.typing-row.visible{display:flex}
+.typing-bub{display:flex;gap:5px;padding:11px 15px;background:var(--wh);border:1px solid var(--bo);border-radius:14px;border-bottom-left-radius:3px}
+.typing-dot{width:6px;height:6px;background:var(--mu);border-radius:50%;animation:bounce 1.3s ease infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.input-zone{padding:14px 20px;background:var(--wh);border-top:1px solid var(--bo);flex-shrink:0}
+.input-inner{display:flex;gap:10px;align-items:flex-end;max-width:860px;margin:0 auto}
+.input-inner textarea{flex:1;padding:11px 16px;border:1.5px solid var(--bo);border-radius:11px;font-size:14px;resize:none;max-height:110px;line-height:1.55;outline:none;transition:border-color .15s;background:var(--bg);color:var(--tx)}
+.input-inner textarea:focus{border-color:var(--g);background:var(--wh)}
+.input-inner textarea::placeholder{color:#bbb}
+.send-btn{width:42px;height:42px;background:var(--g);border:none;border-radius:11px;display:grid;place-items:center;flex-shrink:0;transition:.18s}
+.send-btn:hover{background:var(--gd);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.send-btn svg{width:16px;height:16px;fill:#fff}
+.spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:580px){.sidebar{width:210px}.nav{padding:14px 18px}.hero{padding:48px 16px 32px}.msg-row{max-width:93%}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<div class="page active" id="pg-land">
+  <nav class="nav">
+    <div class="logo"><div class="logo-mark">R</div>ReOrient CM</div>
+    <div class="lang-sw">
+      <button class="active" data-lang="fr" onclick="App.setLang('fr')">FR</button>
+      <button data-lang="en" onclick="App.setLang('en')">EN</button>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-pill" id="l-badge">Assistant IA · Cameroun 2026</div>
+    <h1 id="l-title">Ton plan de reconversion,<br><em>ancré dans ta réalité</em></h1>
+    <p id="l-desc">ReOrient CM analyse ton profil, tes contraintes et les opportunités du marché camerounais pour te proposer un plan concret et actionnable.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" id="l-start" onclick="App.startOrAuth()">▶ Démarrer ma reconversion</button>
+    </div>
+  </div>
+  <div class="features">
+    <div class="fcard"><div class="fcard-ico" style="background:#E1F5EE">🎯</div><h3 id="l-f1h">Plan personnalisé</h3><p id="l-f1p">Adapté à ton diplôme, ta région, ton budget et tes contraintes réelles au Cameroun.</p></div>
+    <div class="fcard"><div class="fcard-ico" style="background:#EEEDFE">🏦</div><h3 id="l-f2h">Ressources locales</h3><p id="l-f2p">FNE, PAJER-U, Orange Digital Center, formations gratuites — les vrais dispositifs.</p></div>
+    <div class="fcard"><div class="fcard-ico" style="background:#FAEEDA">🌍</div><h3 id="l-f3h">10 régions couvertes</h3><p id="l-f3p">De Douala à Maroua, de Kribi à Bafoussam — conseils adaptés à chaque marché.</p></div>
+    <div class="fcard"><div class="fcard-ico" style="background:#FAECE7">☁️</div><h3 id="l-f4h">Sauvegarde cloud</h3><p id="l-f4p">Tes conversations sont liées à ton compte. Accède-y depuis n'importe quel appareil.</p></div>
+  </div>
+</div>
+
+<!-- ═══════════ AUTH ═══════════ -->
+<div class="page" id="pg-auth">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="logo-mark">R</div>ReOrient CM</div>
+    <div class="tabs">
+      <button class="tab active" id="tab-reg" onclick="Auth.tab('register')" data-i18n="tabReg">Créer un compte</button>
+      <button class="tab" id="tab-log" onclick="Auth.tab('login')" data-i18n="tabLog">Se connecter</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+
+    <div id="form-reg">
+      <div class="field"><label data-i18n="fNom">Nom complet</label><input type="text" id="reg-nom" autocomplete="name" placeholder="Jean Dupont"/></div>
+      <div class="field"><label data-i18n="fEmail">Email</label><input type="email" id="reg-email" autocomplete="email" placeholder="jean@email.com"/></div>
+      <div class="field"><label data-i18n="fPw">Mot de passe (6 min.)</label><input type="password" id="reg-pw" autocomplete="new-password" placeholder="••••••••"/></div>
+      <button class="auth-btn" id="reg-btn" onclick="Auth.register()"><span data-i18n="btnReg">Créer mon compte</span></button>
+    </div>
+
+    <div id="form-log" style="display:none">
+      <div class="field"><label data-i18n="fEmail">Email</label><input type="email" id="log-email" autocomplete="email" placeholder="jean@email.com"/></div>
+      <div class="field"><label data-i18n="fPw2">Mot de passe</label><input type="password" id="log-pw" autocomplete="current-password" placeholder="••••••••"/></div>
+      <button class="auth-btn" id="log-btn" onclick="Auth.login()"><span data-i18n="btnLog">Se connecter</span></button>
+    </div>
+
+    <div class="auth-link">
+      <button onclick="App.goto('land')">← <span data-i18n="backHome">Retour à l'accueil</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CHAT ═══════════ -->
+<div class="page" id="pg-chat">
+  <div class="sidebar">
+    <div class="sb-top">
+      <div class="sb-brand"><div class="logo-mark" style="width:26px;height:26px;font-size:12px">R</div>ReOrient CM</div>
+      <div class="sb-me">
+        <div class="sb-avatar" id="sb-av">?</div>
+        <div class="sb-me-info"><div class="sb-name" id="sb-name">—</div><div class="sb-email" id="sb-email">—</div></div>
+      </div>
+      <button class="sb-new-btn" onclick="Chat.newConv()">＋ <span data-i18n="newConv">Nouvelle conversation</span></button>
+    </div>
+    <div class="sb-section" data-i18n="convLabel">Conversations</div>
+    <div class="sb-list" id="sb-list"></div>
+    <div class="sb-bottom">
+      <button class="sb-link-btn" onclick="App.goto('land')">← <span data-i18n="backHome">Retour à l'accueil</span></button>
+      <button class="sb-link-btn" onclick="Auth.logout()">⎋ <span data-i18n="logout">Se déconnecter</span></button>
+    </div>
+  </div>
+  <div class="chat-area">
+    <div class="chat-bar">
+      <div class="chat-bar-l">
+        <div class="logo-mark" style="width:28px;height:28px;font-size:12px">R</div>
+        <div>
+          <div class="chat-conv-title" id="conv-title">ReOrient CM</div>
+          <div class="chat-status"><span class="online-dot"></span><span data-i18n="online">En ligne</span></div>
+        </div>
+      </div>
+      <button class="pdf-btn" id="pdf-btn" onclick="Chat.downloadPDF()">⬇ PDF</button>
+    </div>
+    <div class="messages" id="messages">
+      <div class="empty-chat"><div class="empty-chat-icon">💬</div><p data-i18n="emptyChat">Sélectionne une conversation ou démarre une nouvelle.</p></div>
+    </div>
+    <div class="typing-row" id="typing">
+      <div class="msg-av" style="background:var(--g);color:#fff;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;font-weight:700">R</div>
+      <div class="typing-bub"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+    </div>
+    <div class="input-zone">
+      <div class="input-inner">
+        <textarea id="msg-inp" rows="1" placeholder="Écris ta réponse ici..." onkeydown="Chat.onKey(event)" oninput="Chat.resize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="Chat.send()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════
+   ReOrient CM · v9
+   Architecture : modules isolés, pas d'état global mutable
+   API relative (même serveur = zéro CORS)
+═══════════════════════════════════════════ */
+
+/* ─── CONSTANTES ─── */
+var API = '/api';
+var TOKEN_KEY = 'rcm_tok';
+var USER_KEY  = 'rcm_usr';
+var LANG_KEY  = 'rcm_lang';
+
+/* ─── STORE (lecture/écriture localStorage) ─── */
+var Store = {
+  getToken: function() { return localStorage.getItem(TOKEN_KEY); },
+  getUser:  function() { try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch(e) { return null; } },
+  setAuth:  function(token, user) {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+  clearAuth: function() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  }
+};
+
+/* ─── HTTP ─── */
+var Http = {
+  _h: function(withAuth) {
+    var h = {'Content-Type': 'application/json'};
+    if(withAuth) { var tok = Store.getToken(); if(tok) h['Authorization'] = 'Bearer ' + tok; }
+    return h;
+  },
+  get: async function(path, auth) {
+    var r = await fetch(API + path, {headers: this._h(auth !== false)});
+    if(r.status === 401) { Auth.logout(); throw new Error('401'); }
+    return r;
+  },
+  post: async function(path, body, auth) {
+    var r = await fetch(API + path, {method:'POST', headers: this._h(auth !== false), body: JSON.stringify(body)});
+    if(r.status === 401) { Auth.logout(); throw new Error('401'); }
+    return r;
+  },
+  patch: async function(path, body) {
+    var r = await fetch(API + path, {method:'PATCH', headers: this._h(true), body: JSON.stringify(body)});
+    return r;
+  },
+  del: async function(path) {
+    var r = await fetch(API + path, {method:'DELETE', headers: this._h(true)});
+    return r;
+  }
+};
+
+/* ─── TRADUCTIONS ─── */
+var I18N = {
+  fr: {
+    badge:'Assistant IA · Cameroun 2026',
+    title:'Ton plan de reconversion,<br><em>ancré dans ta réalité</em>',
+    desc:"ReOrient CM analyse ton profil, tes contraintes et les opportunités du marché camerounais pour te proposer un plan concret et actionnable.",
+    start:'▶ Démarrer ma reconversion', loginBtn:'Se connecter',
+    f1h:'Plan personnalisé', f1p:"Adapté à ton diplôme, ta région, ton budget et tes contraintes réelles.",
+    f2h:'Ressources locales',   f2p:"FNE, PAJER-U, Orange Digital Center, formations gratuites.",
+    f3h:'10 régions couvertes', f3p:"De Douala à Maroua, de Kribi à Bafoussam.",
+    f4h:'Sauvegarde cloud',     f4p:"Tes conversations sont liées à ton compte, accessibles partout.",
+    tabReg:'Créer un compte', tabLog:'Se connecter',
+    fNom:'Nom complet', fEmail:'Email', fPw:'Mot de passe (6 min.)', fPw2:'Mot de passe',
+    btnReg:'Créer mon compte', btnLog:'Se connecter',
+    backHome:"Retour à l'accueil", logout:'Se déconnecter',
+    newConv:'Nouvelle conversation', convLabel:'Conversations', online:'En ligne',
+    emptyChat:'Sélectionne une conversation ou démarre une nouvelle.',
+    sbEmpty:"Aucune conversation.\nDémarre ta première !",
+    defTitle:'Nouvelle conversation',
+    planOk:'✅ Ton plan est prêt ! Télécharge-le en PDF ci-dessus.',
+    connErr:"⚠️ Erreur de connexion. Réessaie.",
+    delOk:'Supprimer cette conversation ?',
+    ph:'Écris ta réponse ici...',
+  },
+  en: {
+    badge:'AI Assistant · Cameroon 2026',
+    title:'Your reorientation plan,<br><em>grounded in your reality</em>',
+    desc:"ReOrient CM analyzes your profile, real constraints and Cameroon's job market to offer you a concrete, actionable plan.",
+    start:'▶ Start my reorientation', loginBtn:'Sign in',
+    f1h:'Personalized plan',   f1p:"Tailored to your degree, region, budget and real constraints.",
+    f2h:'Local resources',      f2p:"FNE, PAJER-U, Orange Digital Center, free training programs.",
+    f3h:'10 regions covered',   f3p:"From Douala to Maroua, Kribi to Bafoussam.",
+    f4h:'Cloud backup',         f4p:"Your conversations are tied to your account, accessible anywhere.",
+    tabReg:'Create account', tabLog:'Sign in',
+    fNom:'Full name', fEmail:'Email', fPw:'Password (6+ chars)', fPw2:'Password',
+    btnReg:'Create my account', btnLog:'Sign in',
+    backHome:'Back to home', logout:'Sign out',
+    newConv:'New conversation', convLabel:'Conversations', online:'Online',
+    emptyChat:'Select a conversation or start a new one.',
+    sbEmpty:"No conversations yet.\nStart your first!",
+    defTitle:'New conversation',
+    planOk:'✅ Your plan is ready! Download it as PDF above.',
+    connErr:"⚠️ Connection error. Please try again.",
+    delOk:'Delete this conversation?',
+    ph:'Type your message here...',
+  }
+};
+
+/* ─── APP ─── */
+var App = {
+  lang: 'fr',
+
+  init: function() {
+    // Restaurer la langue sauvegardée
+    var savedLang = localStorage.getItem(LANG_KEY) || 'fr';
+    this.setLang(savedLang);
+    // Si token valide → aller au chat directement, sinon landing
+    if(Store.getToken() && Store.getUser()) {
+      this.goto('chat');
+      Chat.open(false);
+    } else {
+      this.goto('land');
+    }
+  },
+
+  goto: function(page) {
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('pg-' + page).classList.add('active');
+    if(page === 'land') { document.querySelector('#pg-land').scrollTop = 0; }
+  },
+
+  // Si déjà connecté → ouvrir directement le chat, sinon → inscription
+  startOrAuth: async function() {
+    if(Store.getToken() && Store.getUser()) {
+      await Chat.open(false);
+    } else {
+      this.showAuth('register');
+    }
+  },
+
+  showAuth: function(tab) {
+    this.goto('auth');
+    Auth.tab(tab);
+    Auth.clearErr();
+  },
+
+  setLang: function(l) {
+    this.lang = l;
+    localStorage.setItem(LANG_KEY, l);
+    // Toggle visuel
+    document.querySelectorAll('.lang-sw button').forEach(function(b){
+      b.classList.toggle('active', b.dataset.lang === l);
+    });
+    // Traduire landing
+    var d = I18N[l];
+    this._setText('l-badge', d.badge);
+    document.getElementById('l-title').innerHTML = d.title;
+    this._setText('l-desc', d.desc);
+    this._setText('l-start', d.start);
+    this._setText('l-f1h', d.f1h); this._setText('l-f1p', d.f1p);
+    this._setText('l-f2h', d.f2h); this._setText('l-f2p', d.f2p);
+    this._setText('l-f3h', d.f3h); this._setText('l-f3p', d.f3p);
+    this._setText('l-f4h', d.f4h); this._setText('l-f4p', d.f4p);
+    // Traduire éléments data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.dataset.i18n;
+      if(d[key] !== undefined) el.textContent = d[key];
+    });
+    // Placeholder textarea
+    var inp = document.getElementById('msg-inp');
+    if(inp) inp.placeholder = d.ph;
+
+  },
+
+  _setText: function(id, val) {
+    var el = document.getElementById(id);
+    if(el) el.textContent = val;
+  },
+
+  tr: function(key) { return I18N[this.lang][key] || ''; }
+};
+
+/* ─── AUTH ─── */
+var Auth = {
+  tab: function(which) {
+    document.getElementById('form-reg').style.display = which === 'register' ? 'block' : 'none';
+    document.getElementById('form-log').style.display = which === 'login'    ? 'block' : 'none';
+    document.getElementById('tab-reg').classList.toggle('active', which === 'register');
+    document.getElementById('tab-log').classList.toggle('active', which === 'login');
+  },
+
+  showErr: function(msg) {
+    var el = document.getElementById('auth-err');
+    el.textContent = msg;
+    el.style.display = 'block';
+  },
+
+  clearErr: function() {
+    document.getElementById('auth-err').style.display = 'none';
+  },
+
+  _setLoading: function(btnId, loading, labelKey) {
+    var btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span>' : '<span data-i18n="'+labelKey+'">'+App.tr(labelKey)+'</span>';
+  },
+
+  register: async function() {
+    this.clearErr();
+    var nom   = document.getElementById('reg-nom').value.trim();
+    var email = document.getElementById('reg-email').value.trim();
+    var pw    = document.getElementById('reg-pw').value;
+    if(!nom || !email || !pw) { this.showErr('Remplis tous les champs.'); return; }
+    this._setLoading('reg-btn', true, 'btnReg');
+    try {
+      var r = await Http.post('/auth/register', {nom:nom, email:email, password:pw}, false);
+      var d = await r.json();
+      if(!r.ok) { this.showErr(d.detail || 'Erreur inscription.'); this._setLoading('reg-btn', false, 'btnReg'); return; }
+      Store.setAuth(d.token, d.user);
+      await Chat.open(true);
+    } catch(e) {
+      if(e.message !== '401') { this.showErr(App.tr('connErr')); this._setLoading('reg-btn', false, 'btnReg'); }
+    }
+  },
+
+  login: async function() {
+    this.clearErr();
+    var email = document.getElementById('log-email').value.trim();
+    var pw    = document.getElementById('log-pw').value;
+    if(!email || !pw) { this.showErr('Remplis tous les champs.'); return; }
+    this._setLoading('log-btn', true, 'btnLog');
+    try {
+      var r = await Http.post('/auth/login', {email:email, password:pw}, false);
+      var d = await r.json();
+      if(!r.ok) { this.showErr(d.detail || 'Email ou mot de passe incorrect.'); this._setLoading('log-btn', false, 'btnLog'); return; }
+      Store.setAuth(d.token, d.user);
+      await Chat.open(false);
+    } catch(e) {
+      if(e.message !== '401') { this.showErr(App.tr('connErr')); this._setLoading('log-btn', false, 'btnLog'); }
+    }
+  },
+
+  logout: function() {
+    Store.clearAuth();
+    Chat.reset();
+    // Réinitialiser les formulaires et boutons pour la prochaine connexion
+    this._setLoading('reg-btn', false, 'btnReg');
+    this._setLoading('log-btn', false, 'btnLog');
+    document.getElementById('reg-nom').value   = '';
+    document.getElementById('reg-email').value = '';
+    document.getElementById('reg-pw').value    = '';
+    document.getElementById('log-email').value = '';
+    document.getElementById('log-pw').value    = '';
+    this.clearErr();
+    App.goto('land');
+  }
+};
+
+/* ─── CHAT ─── */
+var Chat = {
+  convs: [],       // liste conversations serveur
+  activeId: null,  // conv active
+  activeSid: null, // session_id backend Claude
+
+  reset: function() {
+    this.convs = [];
+    this.activeId = null;
+    this.activeSid = null;
+    this._clearMessages();
+    document.getElementById('conv-title').textContent = 'ReOrient CM';
+    document.getElementById('pdf-btn').style.display = 'none';
+    document.getElementById('sb-list').innerHTML = '';
+  },
+
+  open: async function(isNew) {
+    // Afficher infos utilisateur
+    var user = Store.getUser();
+    if(user) {
+      var initials = (user.nom || '?').split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+      document.getElementById('sb-av').textContent    = initials;
+      document.getElementById('sb-name').textContent  = user.nom   || '';
+      document.getElementById('sb-email').textContent = user.email || '';
+    }
+    App.goto('chat');
+    await this._loadConvs();
+    if(isNew || this.convs.length === 0) {
+      await this.newConv();
+    } else {
+      await this.selectConv(this.convs[0].id);
+    }
+  },
+
+  _loadConvs: async function() {
+    try {
+      var r = await Http.get('/conversations');
+      if(!r.ok) return;
+      this.convs = await r.json();
+      this._renderSidebar();
+    } catch(e) {}
+  },
+
+  newConv: async function() {
+    try {
+      // 1. Créer session Claude
+      var sr = await Http.post('/session/new', {langue: App.lang}, false);
+      var sd = await sr.json();
+      this.activeSid = sd.session_id;
+
+      // 2. Créer conversation en base
+      var cr = await Http.post('/conversations', {
+        title: App.tr('defTitle'),
+        langue: App.lang,
+        session_id: this.activeSid
+      });
+      var cv = await cr.json();
+      this.activeId = cv.id;
+
+      // 3. Sauvegarder message d'accueil
+      await this._saveMsg('assistant', sd.message);
+
+      // 4. Rafraîchir et afficher
+      await this._loadConvs();
+      this._clearMessages();
+      document.getElementById('conv-title').textContent = App.tr('defTitle');
+      document.getElementById('pdf-btn').style.display = 'none';
+      this._renderMsg('assistant', sd.message);
+      document.getElementById('msg-inp').focus();
+    } catch(e) { console.error('newConv:', e); }
+  },
+
+  selectConv: async function(id) {
+    var cv = this.convs.find(function(c){ return c.id === id; });
+    if(!cv) return;
+    this.activeId  = cv.id;
+    this.activeSid = cv.session_id;
+    this._clearMessages();
+    document.getElementById('conv-title').textContent = cv.title;
+    document.getElementById('pdf-btn').style.display = cv.plan_ready ? 'block' : 'none';
+    this._renderSidebar();
+    try {
+      var r = await Http.get('/conversations/' + id + '/messages');
+      var d = await r.json();
+      var self = this;
+      d.messages.forEach(function(m){ self._renderMsg(m.role, m.content); });
+    } catch(e) {}
+    document.getElementById('msg-inp').focus();
+  },
+
+  deleteConv: async function(e, id) {
+    e.stopPropagation();
+    if(!confirm(App.tr('delOk'))) return;
+    try {
+      await Http.del('/conversations/' + id);
+      if(this.activeId === id) {
+        this.activeId = null;
+        this.activeSid = null;
+        this._clearMessages();
+        document.getElementById('conv-title').textContent = 'ReOrient CM';
+        document.getElementById('pdf-btn').style.display = 'none';
+      }
+      await this._loadConvs();
+      if(!this.activeId && this.convs.length > 0) {
+        await this.selectConv(this.convs[0].id);
+      }
+    } catch(e) {}
+  },
+
+  _saveMsg: async function(role, content) {
+    try {
+      var r = await Http.post('/conversations/' + this.activeId + '/messages', {role:role, content:content});
+      var d = await r.json();
+      if(d.title && this.activeId) {
+        document.getElementById('conv-title').textContent = d.title;
+        // Mettre à jour titre local
+        var cv = this.convs.find(function(c){ return c.id === Chat.activeId; });
+        if(cv) cv.title = d.title;
+        this._renderSidebar();
+      }
+    } catch(e) {}
+  },
+
+  send: async function() {
+    var inp = document.getElementById('msg-inp');
+    var txt = inp.value.trim();
+    if(!txt || !this.activeId || !this.activeSid) return;
+    inp.value = '';
+    inp.style.height = 'auto';
+
+    var dateCtx = this._dateCtx();
+    var payload = dateCtx + '\n' + txt;
+
+    this._renderMsg('user', txt);
+    await this._saveMsg('user', txt);   // sauvegarde le texte brut sans le contexte date
+
+    document.getElementById('send-btn').disabled = true;
+    this._showTyping(true);
+
+    try {
+      var r = await Http.post('/chat', {session_id: this.activeSid, message: payload, langue: App.lang}, false);
+      var d = await r.json();
+      this._showTyping(false);
+      this._renderMsg('assistant', d.response);
+      await this._saveMsg('assistant', d.response);
+
+      if(d.plan_ready) {
+        await Http.patch('/conversations/' + this.activeId, {plan_ready: true});
+        document.getElementById('pdf-btn').style.display = 'block';
+        var cv2 = this.convs.find(function(c){ return c.id === Chat.activeId; });
+        if(cv2) cv2.plan_ready = true;
+        var planMsg = App.tr('planOk');
+        this._renderMsg('assistant', planMsg);
+        await this._saveMsg('assistant', planMsg);
+      }
+      await this._loadConvs();
+    } catch(e) {
+      this._showTyping(false);
+      this._renderMsg('assistant', App.tr('connErr'));
+    }
+
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('msg-inp').focus();
+  },
+
+  onKey: function(e) {
+    if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); }
+  },
+
+  resize: function(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+  },
+
+  downloadPDF: async function() {
+    if(!this.activeSid) return;
+    try {
+      var tok = Store.getToken();
+      var r = await fetch(API + '/plan/' + this.activeSid + '/export?format=pdf', {
+        headers: {Authorization: 'Bearer ' + tok}
+      });
+      if(!r.ok) { alert("Génère d'abord un plan complet pour pouvoir l'exporter en PDF."); return; }
+      var blob = await r.blob();
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url;
+      a.download = 'reorient_plan_' + this.activeSid + '.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch(e) {}
+  },
+
+  _clearMessages: function() {
+    var box = document.getElementById('messages');
+    box.innerHTML = '<div class="empty-chat"><div class="empty-chat-icon">💬</div><p>' + App.tr('emptyChat') + '</p></div>';
+  },
+
+  _renderMsg: function(role, content) {
+    var box = document.getElementById('messages');
+    var es  = box.querySelector('.empty-chat');
+    if(es) es.remove();
+
+    var user = Store.getUser();
+    var userInitial = (user && user.nom) ? user.nom[0].toUpperCase() : 'M';
+
+    var row  = document.createElement('div');
+    row.className = 'msg-row ' + role;
+
+    var av   = document.createElement('div');
+    av.className = 'msg-av';
+    av.textContent = role === 'assistant' ? 'R' : userInitial;
+
+    var bub  = document.createElement('div');
+    bub.className = 'msg-bub';
+    bub.innerHTML = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    row.appendChild(av);
+    row.appendChild(bub);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+  },
+
+  _showTyping: function(v) {
+    document.getElementById('typing').classList.toggle('visible', v);
+  },
+
+  _renderSidebar: function() {
+    var list = document.getElementById('sb-list');
+    list.innerHTML = '';
+    if(!this.convs || !this.convs.length) {
+      list.innerHTML = '<div class="sb-empty">' + App.tr('sbEmpty') + '</div>';
+      return;
+    }
+    var self = this;
+    this.convs.forEach(function(cv) {
+      var item = document.createElement('div');
+      item.className = 'sb-item' + (cv.id === self.activeId ? ' active' : '');
+
+      var body = document.createElement('div');
+      body.className = 'sb-item-body';
+      body.onclick = function() { self.selectConv(cv.id); };
+      body.innerHTML =
+        '<div class="sb-item-title">' + self._esc(cv.title) + '</div>' +
+        '<div class="sb-item-date">' + self._relTime(cv.updated_at) + '</div>';
+
+      var del = document.createElement('button');
+      del.className = 'sb-del-btn';
+      del.textContent = '✕';
+      del.onclick = function(e) { self.deleteConv(e, cv.id); };
+
+      item.appendChild(body);
+      item.appendChild(del);
+      list.appendChild(item);
+    });
+  },
+
+  _esc: function(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  },
+
+  _relTime: function(iso) {
+    var isoUtc = iso && !iso.endsWith('Z') && !iso.includes('+') ? iso.replace(' ', 'T') + 'Z' : iso;
+    var diff = Date.now() - new Date(isoUtc).getTime();
+    if(diff < 0) diff = 0;
+    if(diff < 60000)     return App.lang === 'en' ? 'Just now' : "À l'instant";
+    if(diff < 3600000)   return Math.floor(diff / 60000) + ' min';
+    if(diff < 86400000)  return Math.floor(diff / 3600000) + 'h';
+    if(diff < 604800000) return Math.floor(diff / 86400000) + (App.lang === 'en' ? 'd' : 'j');
+    var loc = App.lang === 'en' ? 'en-GB' : 'fr-FR';
+    return new Date(isoUtc).toLocaleDateString(loc, {day:'numeric', month:'short'});
+  },
+
+  _dateCtx: function() {
+    var d = new Date();
+    var J = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    var M = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    return '[Date du jour : ' + J[d.getDay()] + ' ' + d.getDate() + ' ' + M[d.getMonth()] + ' ' + d.getFullYear() + '. Utilise cette date pour tout calcul de délais.]';
+  }
+};
+
+/* ─── DÉMARRAGE ─── */
+document.addEventListener('DOMContentLoaded', function() {
+  App.init();
+});
+</script>
+</body>
+</html>
