@@ -148,4 +148,3 @@ Développé dans le cadre du projet de fin d'études d'ingénieur en génie num�
 ---
 
 *ReOrient CM — Parce que ton diplôme mérite une seconde chance.*
-"# reorient-cm" 
