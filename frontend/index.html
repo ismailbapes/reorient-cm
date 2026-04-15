@@ -200,12 +200,43 @@ a{text-decoration:none}
     </div>
 
     <div class="auth-link">
+      <button onclick="Auth.showForgot()" id="forgot-link">Mot de passe oublié ?</button>
+    </div>
+    <div class="auth-link" style="margin-top:6px;">
       <button onclick="App.goto('land')">← <span data-i18n="backHome">Retour à l'accueil</span></button>
     </div>
   </div>
 </div>
 
 <!-- ═══════════ CHAT ═══════════ -->
+<!-- FORGOT PASSWORD -->
+<div class="page" id="pg-forgot">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="logo-mark">R</div>ReOrient CM</div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;" id="forgot-title">Mot de passe oublié</h2>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:20px;line-height:1.6;" id="forgot-desc">Entrez votre email — nous vous enverrons un lien valable 30 minutes.</p>
+    <div class="auth-err" id="forgot-err"></div>
+    <div id="forgot-ok" style="display:none;background:#E1F5EE;border:1px solid #1D9E75;color:#085041;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;"></div>
+    <div class="field"><label>Email</label><input type="email" id="forgot-email" placeholder="jean@email.com" autocomplete="email"/></div>
+    <button class="auth-btn" id="forgot-btn" onclick="Auth.sendForgot()"><span id="forgot-btn-txt">Envoyer le lien</span></button>
+    <div class="auth-link" style="margin-top:16px;"><button onclick="App.showAuth('login')" id="back-login1">← Retour à la connexion</button></div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD -->
+<div class="page" id="pg-reset">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="logo-mark">R</div>ReOrient CM</div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px;" id="reset-title">Nouveau mot de passe</h2>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:20px;line-height:1.6;" id="reset-desc">Choisissez un nouveau mot de passe pour votre compte.</p>
+    <div class="auth-err" id="reset-err"></div>
+    <div id="reset-ok" style="display:none;background:#E1F5EE;border:1px solid #1D9E75;color:#085041;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;"></div>
+    <div class="field"><label id="reset-pw-lbl">Nouveau mot de passe (6 min.)</label><input type="password" id="reset-pw" placeholder="••••••••"/></div>
+    <button class="auth-btn" id="reset-btn" onclick="Auth.doReset()"><span id="reset-btn-txt">Mettre à jour</span></button>
+    <div class="auth-link" style="margin-top:16px;"><button onclick="App.showAuth('login')" id="back-login2">← Retour à la connexion</button></div>
+  </div>
+</div>
+
 <div class="page" id="pg-chat">
   <div class="sidebar">
     <div class="sb-top">
@@ -331,6 +362,18 @@ var I18N = {
     connErr:"⚠️ Erreur de connexion. Réessaie.",
     delOk:'Supprimer cette conversation ?',
     ph:'Écris ta réponse ici...',
+    forgotPw:"Mot de passe oublié ?",
+    forgotTitle:"Mot de passe oublié",
+    forgotDesc:"Entrez votre email — nous vous enverrons un lien valable 30 minutes.",
+    forgotBtn:"Envoyer le lien",
+    forgotOk:"Lien envoyé ! Vérifiez votre boîte mail.",
+    backToLogin:"← Retour à la connexion",
+    resetTitle:"Nouveau mot de passe",
+    resetDesc:"Choisissez un nouveau mot de passe pour votre compte.",
+    resetPwLabel:"Nouveau mot de passe (6 min.)",
+    resetBtn:"Mettre à jour",
+    resetOk:"Mot de passe mis à jour ! Connectez-vous.",
+    resetErr:"Lien invalide ou expiré.",
   },
   en: {
     badge:'AI Assistant · Cameroon 2026',
@@ -353,6 +396,18 @@ var I18N = {
     connErr:"⚠️ Connection error. Please try again.",
     delOk:'Delete this conversation?',
     ph:'Type your message here...',
+    forgotPw:"Forgot password?",
+    forgotTitle:"Forgot your password?",
+    forgotDesc:"Enter your email — we'll send you a reset link valid for 30 minutes.",
+    forgotBtn:"Send reset link",
+    forgotOk:"Link sent! Check your inbox.",
+    backToLogin:"← Back to sign in",
+    resetTitle:"New password",
+    resetDesc:"Choose a new password for your account.",
+    resetPwLabel:"New password (6+ chars)",
+    resetBtn:"Update password",
+    resetOk:"Password updated! You can now sign in.",
+    resetErr:"Invalid or expired link.",
   }
 };
 
@@ -375,7 +430,8 @@ var App = {
 
   goto: function(page) {
     document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-    document.getElementById('pg-' + page).classList.add('active');
+    var el = document.getElementById('pg-' + page);
+    if(el) el.classList.add('active');
     if(page === 'land') { document.querySelector('#pg-land').scrollTop = 0; }
   },
 
@@ -419,6 +475,16 @@ var App = {
     // Placeholder textarea
     var inp = document.getElementById('msg-inp');
     if(inp) inp.placeholder = d.ph;
+    var fl=document.getElementById('forgot-link');     if(fl)  fl.textContent  = d.forgotPw;
+    var ft=document.getElementById('forgot-title');    if(ft)  ft.textContent  = d.forgotTitle;
+    var fd=document.getElementById('forgot-desc');     if(fd)  fd.textContent  = d.forgotDesc;
+    var fbt=document.getElementById('forgot-btn-txt'); if(fbt) fbt.textContent = d.forgotBtn;
+    var bl1=document.getElementById('back-login1');    if(bl1) bl1.textContent = d.backToLogin;
+    var rt=document.getElementById('reset-title');     if(rt)  rt.textContent  = d.resetTitle;
+    var rd=document.getElementById('reset-desc');      if(rd)  rd.textContent  = d.resetDesc;
+    var rpl=document.getElementById('reset-pw-lbl');   if(rpl) rpl.textContent = d.resetPwLabel;
+    var rbt=document.getElementById('reset-btn-txt');  if(rbt) rbt.textContent = d.resetBtn;
+    var bl2=document.getElementById('back-login2');    if(bl2) bl2.textContent = d.backToLogin;
 
   },
 
@@ -489,6 +555,90 @@ var Auth = {
       if(e.message !== '401') { this.showErr(App.tr('connErr')); this._setLoading('log-btn', false, 'btnLog'); }
     }
   },
+
+  showForgot: function() {
+    App.goto('forgot');
+    document.getElementById('forgot-email').value = '';
+    document.getElementById('forgot-err').style.display = 'none';
+    document.getElementById('forgot-ok').style.display  = 'none';
+    document.getElementById('forgot-btn').disabled = false;
+    document.getElementById('forgot-btn-txt').textContent = App.tr('forgotBtn');
+  },
+
+  sendForgot: async function() {
+    var email = document.getElementById('forgot-email').value.trim();
+    if(!email) { 
+      var errEl = document.getElementById('forgot-err');
+      errEl.textContent = 'Entrez votre adresse email.';
+      errEl.style.display = 'block';
+      return; 
+    }
+    var btn = document.getElementById('forgot-btn');
+    btn.disabled = true;
+    document.getElementById('forgot-btn-txt').innerHTML = '<span class="spinner"></span>';
+    document.getElementById('forgot-err').style.display = 'none';
+    try {
+      await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, langue: App.lang})
+      });
+      // Toujours afficher OK (sécurité — on ne révèle pas si l'email existe)
+      document.getElementById('forgot-ok').textContent = App.tr('forgotOk');
+      document.getElementById('forgot-ok').style.display = 'block';
+      document.getElementById('forgot-btn-txt').textContent = App.tr('forgotBtn');
+    } catch(e) {
+      var errEl2 = document.getElementById('forgot-err');
+      errEl2.textContent = App.tr('connErr');
+      errEl2.style.display = 'block';
+      document.getElementById('forgot-btn-txt').textContent = App.tr('forgotBtn');
+    }
+    btn.disabled = false;
+  },
+
+  doReset: async function() {
+    var pw = document.getElementById('reset-pw').value;
+    var token = Auth._resetToken || '';
+    if(!pw || pw.length < 6) {
+      var errEl = document.getElementById('reset-err');
+      errEl.textContent = App.lang === 'en' ? 'Password must be at least 6 characters.' : 'Le mot de passe doit contenir au moins 6 caractères.';
+      errEl.style.display = 'block';
+      return;
+    }
+    var btn = document.getElementById('reset-btn');
+    btn.disabled = true;
+    document.getElementById('reset-btn-txt').innerHTML = '<span class="spinner"></span>';
+    document.getElementById('reset-err').style.display = 'none';
+    try {
+      var r = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: token, new_password: pw})
+      });
+      var d = await r.json();
+      if(!r.ok) {
+        document.getElementById('reset-err').textContent = d.detail || App.tr('resetErr');
+        document.getElementById('reset-err').style.display = 'block';
+        document.getElementById('reset-btn-txt').textContent = App.tr('resetBtn');
+        btn.disabled = false;
+        return;
+      }
+      document.getElementById('reset-ok').textContent = App.tr('resetOk');
+      document.getElementById('reset-ok').style.display = 'block';
+      document.getElementById('reset-pw').value = '';
+      document.getElementById('reset-btn-txt').textContent = App.tr('resetBtn');
+      btn.disabled = false;
+      // Rediriger vers login après 2s
+      setTimeout(function(){ App.showAuth('login'); }, 2000);
+    } catch(e) {
+      document.getElementById('reset-err').textContent = App.tr('connErr');
+      document.getElementById('reset-err').style.display = 'block';
+      document.getElementById('reset-btn-txt').textContent = App.tr('resetBtn');
+      btn.disabled = false;
+    }
+  },
+
+  _resetToken: null,
 
   logout: function() {
     Store.clearAuth();
@@ -790,7 +940,17 @@ var Chat = {
 
 /* ─── DÉMARRAGE ─── */
 document.addEventListener('DOMContentLoaded', function() {
-  App.init();
+  // Vérifier si c'est un lien de réinitialisation (?token=xxx)
+  var urlParams = new URLSearchParams(window.location.search);
+  var resetToken = urlParams.get('token');
+  if(resetToken) {
+    Auth._resetToken = resetToken;
+    App.goto('reset');
+    // Nettoyer l'URL
+    window.history.replaceState({}, document.title, '/');
+  } else {
+    App.init();
+  }
 });
 </script>
 </body>
