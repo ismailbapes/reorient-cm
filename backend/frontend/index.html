@@ -197,12 +197,12 @@ a{text-decoration:none}
       <div class="field"><label data-i18n="fEmail">Email</label><input type="email" id="log-email" autocomplete="email" placeholder="jean@email.com"/></div>
       <div class="field"><label data-i18n="fPw2">Mot de passe</label><input type="password" id="log-pw" autocomplete="current-password" placeholder="••••••••"/></div>
       <button class="auth-btn" id="log-btn" onclick="Auth.login()"><span data-i18n="btnLog">Se connecter</span></button>
+      <div class="auth-link" style="margin-top:12px;">
+        <button onclick="Auth.showForgot()" id="forgot-link">Mot de passe oublié ?</button>
+      </div>
     </div>
 
     <div class="auth-link">
-      <button onclick="Auth.showForgot()" id="forgot-link">Mot de passe oublié ?</button>
-    </div>
-    <div class="auth-link" style="margin-top:6px;">
       <button onclick="App.goto('land')">← <span data-i18n="backHome">Retour à l'accueil</span></button>
     </div>
   </div>
@@ -782,7 +782,16 @@ var Chat = {
   send: async function() {
     var inp = document.getElementById('msg-inp');
     var txt = inp.value.trim();
-    if(!txt || !this.activeId || !this.activeSid) return;
+    if(!txt || !this.activeId) return;
+    // Si pas de session Claude active (ex: après redémarrage serveur), en créer une nouvelle
+    if(!this.activeSid) {
+      try {
+        var sr = await Http.post('/session/new', {langue: App.lang}, false);
+        var sd = await sr.json();
+        this.activeSid = sd.session_id;
+        await Http.patch('/conversations/' + this.activeId, {session_id: this.activeSid});
+      } catch(e) { this._renderMsg('assistant', App.tr('connErr')); return; }
+    }
     inp.value = '';
     inp.style.height = 'auto';
 
@@ -940,13 +949,15 @@ var Chat = {
 
 /* ─── DÉMARRAGE ─── */
 document.addEventListener('DOMContentLoaded', function() {
+  // Restaurer la langue sauvegardée en premier
+  var savedLang = localStorage.getItem(LANG_KEY) || 'fr';
+  App.setLang(savedLang);
   // Vérifier si c'est un lien de réinitialisation (?token=xxx)
   var urlParams = new URLSearchParams(window.location.search);
   var resetToken = urlParams.get('token');
   if(resetToken) {
     Auth._resetToken = resetToken;
     App.goto('reset');
-    // Nettoyer l'URL
     window.history.replaceState({}, document.title, '/');
   } else {
     App.init();
