@@ -17,6 +17,11 @@
   --st:rgba(255,255,255,.85);--sm:rgba(255,255,255,.42);
   --r:12px;--shadow:0 2px 16px rgba(0,0,0,.07)
 }
+[data-theme="dark"]{
+  --bg:#0F1010;--wh:#1A1D1D;--tx:#E8E6E1;--mu:#9A9893;--bo:rgba(255,255,255,.09);
+  --gl:rgba(29,158,117,.15);--shadow:0 2px 16px rgba(0,0,0,.3)
+}
+html,body{transition:background .25s,color .25s}
 html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 button{cursor:pointer;font-family:'DM Sans',sans-serif}
 input,textarea{font-family:'DM Sans',sans-serif}
@@ -147,6 +152,26 @@ a{text-decoration:none}
 .spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:580px){.sidebar{width:210px}.nav{padding:14px 18px}.hero{padding:48px 16px 32px}.msg-row{max-width:93%}}
+
+/* ── THEME TOGGLE ── */
+.theme-btn{width:32px;height:32px;border:1.5px solid var(--bo);background:transparent;border-radius:8px;display:grid;place-items:center;font-size:16px;transition:all .15s;color:var(--tx)}
+.theme-btn:hover{border-color:var(--g);color:var(--g)}
+
+/* ── SEARCH BAR ── */
+.search-bar{display:none;align-items:center;gap:8px;padding:10px 20px;background:var(--wh);border-bottom:1px solid var(--bo);flex-shrink:0}
+.search-bar.visible{display:flex}
+.search-inp{flex:1;padding:8px 14px;border:1.5px solid var(--bo);border-radius:9px;font-size:13px;background:var(--bg);color:var(--tx);outline:none;transition:border-color .15s}
+.search-inp:focus{border-color:var(--g)}
+.search-inp::placeholder{color:var(--mu)}
+.search-count{font-size:12px;color:var(--mu);white-space:nowrap}
+.search-nav{display:flex;gap:4px}
+.search-nav button{width:28px;height:28px;border:1.5px solid var(--bo);background:transparent;border-radius:7px;font-size:13px;color:var(--mu);transition:all .15s}
+.search-nav button:hover{border-color:var(--g);color:var(--g)}
+.search-close{width:28px;height:28px;border:none;background:transparent;font-size:18px;color:var(--mu);transition:color .15s}
+.search-close:hover{color:var(--tx)}
+.msg-highlight{background:#FFE066;border-radius:3px;padding:0 2px}
+[data-theme="dark"] .msg-highlight{background:#8B6914;color:#FFE066}
+.msg-bub.search-active{outline:2px solid var(--g);outline-offset:2px;border-radius:14px}
 </style>
 </head>
 <body>
@@ -155,9 +180,12 @@ a{text-decoration:none}
 <div class="page active" id="pg-land">
   <nav class="nav">
     <div class="logo"><div class="logo-mark">R</div>ReOrient CM</div>
-    <div class="lang-sw">
-      <button class="active" data-lang="fr" onclick="App.setLang('fr')">FR</button>
-      <button data-lang="en" onclick="App.setLang('en')">EN</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="theme-btn" id="theme-btn-land" onclick="App.toggleTheme()" title="Mode sombre">🌙</button>
+      <div class="lang-sw">
+        <button class="active" data-lang="fr" onclick="App.setLang('fr')">FR</button>
+        <button data-lang="en" onclick="App.setLang('en')">EN</button>
+      </div>
     </div>
   </nav>
   <div class="hero">
@@ -263,7 +291,20 @@ a{text-decoration:none}
           <div class="chat-status"><span class="online-dot"></span><span data-i18n="online">En ligne</span></div>
         </div>
       </div>
-      <button class="pdf-btn" id="pdf-btn" onclick="Chat.downloadPDF()">⬇ PDF</button>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <button class="theme-btn" id="theme-btn-chat" onclick="App.toggleTheme()" title="Mode sombre">🌙</button>
+        <button class="theme-btn" id="search-btn" onclick="Search.toggle()" title="Rechercher">🔍</button>
+        <button class="pdf-btn" id="pdf-btn" onclick="Chat.downloadPDF()">⬇ PDF</button>
+      </div>
+    </div>
+    <div class="search-bar" id="search-bar">
+      <input class="search-inp" id="search-inp" type="text" placeholder="Rechercher dans la conversation..." oninput="Search.run()" onkeydown="Search.onKey(event)"/>
+      <span class="search-count" id="search-count"></span>
+      <div class="search-nav">
+        <button onclick="Search.prev()" title="Précédent">↑</button>
+        <button onclick="Search.next()" title="Suivant">↓</button>
+      </div>
+      <button class="search-close" onclick="Search.close()">×</button>
     </div>
     <div class="messages" id="messages">
       <div class="empty-chat"><div class="empty-chat-icon">💬</div><p data-i18n="emptyChat">Sélectionne une conversation ou démarre une nouvelle.</p></div>
@@ -362,6 +403,8 @@ var I18N = {
     connErr:"⚠️ Erreur de connexion. Réessaie.",
     delOk:'Supprimer cette conversation ?',
     ph:'Écris ta réponse ici...',
+    searchPh:'Rechercher dans la conversation...',
+    noResult:'Aucun résultat',
     forgotPw:"Mot de passe oublié ?",
     forgotTitle:"Mot de passe oublié",
     forgotDesc:"Entrez votre email — nous vous enverrons un lien valable 30 minutes.",
@@ -396,6 +439,8 @@ var I18N = {
     connErr:"⚠️ Connection error. Please try again.",
     delOk:'Delete this conversation?',
     ph:'Type your message here...',
+    searchPh:'Search in conversation...',
+    noResult:'No results',
     forgotPw:"Forgot password?",
     forgotTitle:"Forgot your password?",
     forgotDesc:"Enter your email — we'll send you a reset link valid for 30 minutes.",
@@ -485,6 +530,7 @@ var App = {
     var rpl=document.getElementById('reset-pw-lbl');   if(rpl) rpl.textContent = d.resetPwLabel;
     var rbt=document.getElementById('reset-btn-txt');  if(rbt) rbt.textContent = d.resetBtn;
     var bl2=document.getElementById('back-login2');    if(bl2) bl2.textContent = d.backToLogin;
+    var si=document.getElementById('search-inp'); if(si) si.placeholder = d.searchPh;
 
   },
 
@@ -948,7 +994,113 @@ var Chat = {
 };
 
 /* ─── DÉMARRAGE ─── */
+/* ─── THEME ─── */
+var THEME_KEY = 'rcm_theme';
+App.toggleTheme = function() {
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next === 'dark' ? 'dark' : '');
+  localStorage.setItem(THEME_KEY, next);
+  var icon = next === 'dark' ? '☀️' : '🌙';
+  ['theme-btn-land','theme-btn-chat'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.textContent = icon;
+  });
+};
+App._initTheme = function() {
+  var saved = localStorage.getItem(THEME_KEY) || 'light';
+  if(saved === 'dark') {
+    document.documentElement.setAttribute('data-theme','dark');
+    ['theme-btn-land','theme-btn-chat'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.textContent = '☀️';
+    });
+  }
+};
+
+/* ─── SEARCH ─── */
+var Search = {
+  results: [],
+  current: -1,
+
+  toggle: function() {
+    var bar = document.getElementById('search-bar');
+    var visible = bar.classList.contains('visible');
+    if(visible) { this.close(); }
+    else {
+      bar.classList.add('visible');
+      document.getElementById('search-inp').focus();
+    }
+  },
+
+  close: function() {
+    document.getElementById('search-bar').classList.remove('visible');
+    document.getElementById('search-inp').value = '';
+    document.getElementById('search-count').textContent = '';
+    this._clearHighlights();
+    this.results = []; this.current = -1;
+  },
+
+  run: function() {
+    this._clearHighlights();
+    var q = document.getElementById('search-inp').value.trim().toLowerCase();
+    this.results = []; this.current = -1;
+    if(!q) { document.getElementById('search-count').textContent = ''; return; }
+    var bubs = document.querySelectorAll('#messages .msg-bub');
+    bubs.forEach(function(bub) {
+      var txt = bub.textContent.toLowerCase();
+      if(txt.includes(q)) { Search.results.push(bub); }
+    });
+    // Surligner
+    this.results.forEach(function(bub) {
+      var html = bub.innerHTML;
+      var escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      bub.innerHTML = html.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark class="msg-highlight">$1</mark>');
+    });
+    var n = this.results.length;
+    document.getElementById('search-count').textContent = n > 0 ? '1/' + n : 'Aucun résultat';
+    if(n > 0) { this.current = 0; this._scrollTo(0); }
+  },
+
+  next: function() {
+    if(!this.results.length) return;
+    this.current = (this.current + 1) % this.results.length;
+    this._scrollTo(this.current);
+    document.getElementById('search-count').textContent = (this.current+1) + '/' + this.results.length;
+  },
+
+  prev: function() {
+    if(!this.results.length) return;
+    this.current = (this.current - 1 + this.results.length) % this.results.length;
+    this._scrollTo(this.current);
+    document.getElementById('search-count').textContent = (this.current+1) + '/' + this.results.length;
+  },
+
+  onKey: function(e) {
+    if(e.key === 'Enter') { e.shiftKey ? this.prev() : this.next(); }
+    if(e.key === 'Escape') { this.close(); }
+  },
+
+  _scrollTo: function(idx) {
+    var bubs = document.querySelectorAll('#messages .msg-bub');
+    bubs.forEach(function(b){ b.classList.remove('search-active'); });
+    var target = this.results[idx];
+    if(target) {
+      target.classList.add('search-active');
+      target.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  },
+
+  _clearHighlights: function() {
+    document.querySelectorAll('#messages .msg-highlight').forEach(function(el){
+      el.outerHTML = el.textContent;
+    });
+    document.querySelectorAll('#messages .msg-bub').forEach(function(b){
+      b.classList.remove('search-active');
+    });
+  }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+  App._initTheme();
   // Restaurer la langue sauvegardée en premier
   var savedLang = localStorage.getItem(LANG_KEY) || 'fr';
   App.setLang(savedLang);
