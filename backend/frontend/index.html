@@ -108,7 +108,7 @@ a{text-decoration:none}
 .sb-link-btn:hover{color:#fff;border-color:rgba(255,255,255,.28)}
 
 /* ───────── CHAT MAIN ───────── */
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
 .chat-bar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;background:var(--wh);border-bottom:1px solid var(--bo);flex-shrink:0}
 .chat-bar-l{display:flex;align-items:center;gap:11px}
 .chat-conv-title{font-family:'Sora',sans-serif;font-weight:600;font-size:15px}
@@ -141,6 +141,10 @@ a{text-decoration:none}
 .typing-dot:nth-child(3){animation-delay:.4s}
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
 .input-zone{padding:14px 20px;background:var(--wh);border-top:1px solid var(--bo);flex-shrink:0}
+.scroll-nav{position:absolute;right:18px;bottom:90px;display:flex;flex-direction:column;gap:6px;z-index:10}
+.scroll-nav-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--bo);background:var(--wh);color:var(--tx);font-size:16px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);transition:.15s;opacity:0;pointer-events:none}
+.scroll-nav-btn:hover{background:var(--g);color:#fff;border-color:var(--g)}
+.scroll-nav-btn.visible{opacity:1;pointer-events:all}
 .input-inner{display:flex;gap:10px;align-items:flex-end;max-width:860px;margin:0 auto}
 .input-inner textarea{flex:1;padding:11px 16px;border:1.5px solid var(--bo);border-radius:11px;font-size:14px;resize:none;max-height:110px;line-height:1.55;outline:none;transition:border-color .15s;background:var(--bg);color:var(--tx)}
 .input-inner textarea:focus{border-color:var(--g);background:var(--wh)}
@@ -152,6 +156,12 @@ a{text-decoration:none}
 .spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:580px){.sidebar{width:210px}.nav{padding:14px 18px}.hero{padding:48px 16px 32px}.msg-row{max-width:93%}}
+/* ── SCROLL SHORTCUTS ── */
+.scroll-btns{position:absolute;right:18px;bottom:80px;display:flex;flex-direction:column;gap:6px;z-index:10}
+.scroll-btn{width:34px;height:34px;background:var(--wh);border:1.5px solid var(--bo);border-radius:9px;display:grid;place-items:center;font-size:15px;color:var(--mu);box-shadow:var(--shadow);transition:all .18s;opacity:0;pointer-events:none}
+.scroll-btn.show{opacity:1;pointer-events:all}
+.scroll-btn:hover{border-color:var(--g);color:var(--g);transform:scale(1.08)}
+.chat-area{position:relative}
 
 /* ── THEME TOGGLE ── */
 .theme-btn{width:32px;height:32px;border:1.5px solid var(--bo);background:transparent;border-radius:8px;display:grid;place-items:center;font-size:16px;transition:all .15s;color:var(--tx)}
@@ -306,8 +316,16 @@ a{text-decoration:none}
       </div>
       <button class="search-close" onclick="Search.close()">×</button>
     </div>
+    <div class="scroll-nav" id="scroll-nav">
+      <button class="scroll-nav-btn" id="scroll-top-btn" onclick="Chat.scrollToTop()" title="Premier message">⬆</button>
+      <button class="scroll-nav-btn" id="scroll-bot-btn" onclick="Chat.scrollToBottom()" title="Dernier message">⬇</button>
+    </div>
     <div class="messages" id="messages">
       <div class="empty-chat"><div class="empty-chat-icon">💬</div><p data-i18n="emptyChat">Sélectionne une conversation ou démarre une nouvelle.</p></div>
+    </div>
+    <div class="scroll-btns">
+      <button class="scroll-btn" id="scroll-top-btn" onclick="Chat.scrollToTop()" title="Premier message">⬆</button>
+      <button class="scroll-btn" id="scroll-bot-btn" onclick="Chat.scrollToBottom()" title="Dernier message">⬇</button>
     </div>
     <div class="typing-row" id="typing">
       <div class="msg-av" style="background:var(--g);color:#fff;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;font-weight:700">R</div>
@@ -770,6 +788,7 @@ var Chat = {
       document.getElementById('conv-title').textContent = App.tr('defTitle');
       document.getElementById('pdf-btn').style.display = 'none';
       this._renderMsg('assistant', sd.message);
+      this._updateScrollNav();
       document.getElementById('msg-inp').focus();
     } catch(e) { console.error('newConv:', e); }
   },
@@ -788,6 +807,7 @@ var Chat = {
       var d = await r.json();
       var self = this;
       d.messages.forEach(function(m){ self._renderMsg(m.role, m.content); });
+      this._updateScrollNav();
     } catch(e) {}
     document.getElementById('msg-inp').focus();
   },
@@ -855,6 +875,7 @@ var Chat = {
       var d = await r.json();
       this._showTyping(false);
       this._renderMsg('assistant', d.response);
+      this._updateScrollNav();
       await this._saveMsg('assistant', d.response);
 
       if(d.plan_ready) {
@@ -903,9 +924,29 @@ var Chat = {
     } catch(e) {}
   },
 
+  scrollToTop: function() {
+    document.getElementById('messages').scrollTo({top:0, behavior:'smooth'});
+  },
+  scrollToBottom: function() {
+    var box = document.getElementById('messages');
+    box.scrollTo({top:box.scrollHeight, behavior:'smooth'});
+  },
+  _updateScrollBtns: function() {
+    var box = document.getElementById('messages');
+    var hasMsg = box.querySelector('.msg-row') !== null;
+    var t = document.getElementById('scroll-top-btn');
+    var b = document.getElementById('scroll-bot-btn');
+    if(!t || !b) return;
+    if(!hasMsg){ t.classList.remove('show'); b.classList.remove('show'); return; }
+    var atTop    = box.scrollTop < 40;
+    var atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+    t.classList.toggle('show', !atTop);
+    b.classList.toggle('show', !atBottom);
+  },
   _clearMessages: function() {
     var box = document.getElementById('messages');
     box.innerHTML = '<div class="empty-chat"><div class="empty-chat-icon">💬</div><p>' + App.tr('emptyChat') + '</p></div>';
+    this._updateScrollBtns();
   },
 
   _renderMsg: function(role, content) {
@@ -933,10 +974,31 @@ var Chat = {
     row.appendChild(bub);
     box.appendChild(row);
     box.scrollTop = box.scrollHeight;
+    Chat._updateScrollBtns();
   },
 
   _showTyping: function(v) {
     document.getElementById('typing').classList.toggle('visible', v);
+  },
+
+  scrollToTop: function() {
+    var box = document.getElementById('messages');
+    box.scrollTo({top: 0, behavior: 'smooth'});
+  },
+
+  scrollToBottom: function() {
+    var box = document.getElementById('messages');
+    box.scrollTo({top: box.scrollHeight, behavior: 'smooth'});
+  },
+
+  _updateScrollNav: function() {
+    var box = document.getElementById('messages');
+    var msgs = box.querySelectorAll('.msg-row');
+    var hasMessages = msgs.length > 0;
+    var topBtn = document.getElementById('scroll-top-btn');
+    var botBtn = document.getElementById('scroll-bot-btn');
+    if (topBtn) topBtn.classList.toggle('visible', hasMessages);
+    if (botBtn) botBtn.classList.toggle('visible', hasMessages);
   },
 
   _renderSidebar: function() {
@@ -1101,6 +1163,8 @@ var Search = {
 
 document.addEventListener('DOMContentLoaded', function() {
   App._initTheme();
+  var msgBox = document.getElementById('messages');
+  if(msgBox) msgBox.addEventListener('scroll', function(){ Chat._updateScrollBtns(); });
   // Restaurer la langue sauvegardée en premier
   var savedLang = localStorage.getItem(LANG_KEY) || 'fr';
   App.setLang(savedLang);
