@@ -141,10 +141,7 @@ a{text-decoration:none}
 .typing-dot:nth-child(3){animation-delay:.4s}
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
 .input-zone{padding:14px 20px;background:var(--wh);border-top:1px solid var(--bo);flex-shrink:0}
-.scroll-nav{position:absolute;right:18px;bottom:90px;display:flex;flex-direction:column;gap:6px;z-index:10}
-.scroll-nav-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--bo);background:var(--wh);color:var(--tx);font-size:16px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);transition:.15s;opacity:0;pointer-events:none}
-.scroll-nav-btn:hover{background:var(--g);color:#fff;border-color:var(--g)}
-.scroll-nav-btn.visible{opacity:1;pointer-events:all}
+
 .input-inner{display:flex;gap:10px;align-items:flex-end;max-width:860px;margin:0 auto}
 .input-inner textarea{flex:1;padding:11px 16px;border:1.5px solid var(--bo);border-radius:11px;font-size:14px;resize:none;max-height:110px;line-height:1.55;outline:none;transition:border-color .15s;background:var(--bg);color:var(--tx)}
 .input-inner textarea:focus{border-color:var(--g);background:var(--wh)}
@@ -315,10 +312,6 @@ a{text-decoration:none}
         <button onclick="Search.next()" title="Suivant">↓</button>
       </div>
       <button class="search-close" onclick="Search.close()">×</button>
-    </div>
-    <div class="scroll-nav" id="scroll-nav">
-      <button class="scroll-nav-btn" id="scroll-top-btn" onclick="Chat.scrollToTop()" title="Premier message">⬆</button>
-      <button class="scroll-nav-btn" id="scroll-bot-btn" onclick="Chat.scrollToBottom()" title="Dernier message">⬇</button>
     </div>
     <div class="messages" id="messages">
       <div class="empty-chat"><div class="empty-chat-icon">💬</div><p data-i18n="emptyChat">Sélectionne une conversation ou démarre une nouvelle.</p></div>
@@ -788,7 +781,7 @@ var Chat = {
       document.getElementById('conv-title').textContent = App.tr('defTitle');
       document.getElementById('pdf-btn').style.display = 'none';
       this._renderMsg('assistant', sd.message);
-      this._updateScrollNav();
+      this._updateScrollBtns();
       document.getElementById('msg-inp').focus();
     } catch(e) { console.error('newConv:', e); }
   },
@@ -807,7 +800,7 @@ var Chat = {
       var d = await r.json();
       var self = this;
       d.messages.forEach(function(m){ self._renderMsg(m.role, m.content); });
-      this._updateScrollNav();
+      this._updateScrollBtns();
     } catch(e) {}
     document.getElementById('msg-inp').focus();
   },
@@ -875,7 +868,7 @@ var Chat = {
       var d = await r.json();
       this._showTyping(false);
       this._renderMsg('assistant', d.response);
-      this._updateScrollNav();
+      this._updateScrollBtns();
       await this._saveMsg('assistant', d.response);
 
       if(d.plan_ready) {
@@ -979,26 +972,6 @@ var Chat = {
 
   _showTyping: function(v) {
     document.getElementById('typing').classList.toggle('visible', v);
-  },
-
-  scrollToTop: function() {
-    var box = document.getElementById('messages');
-    box.scrollTo({top: 0, behavior: 'smooth'});
-  },
-
-  scrollToBottom: function() {
-    var box = document.getElementById('messages');
-    box.scrollTo({top: box.scrollHeight, behavior: 'smooth'});
-  },
-
-  _updateScrollNav: function() {
-    var box = document.getElementById('messages');
-    var msgs = box.querySelectorAll('.msg-row');
-    var hasMessages = msgs.length > 0;
-    var topBtn = document.getElementById('scroll-top-btn');
-    var botBtn = document.getElementById('scroll-bot-btn');
-    if (topBtn) topBtn.classList.toggle('visible', hasMessages);
-    if (botBtn) botBtn.classList.toggle('visible', hasMessages);
   },
 
   _renderSidebar: function() {
