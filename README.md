@@ -1,73 +1,86 @@
 # ReOrient CM 🎯
 
-**Assistant IA de reconversion professionnelle pour diplômés camerounais**
+**Assistant conversationnel basé sur l'Intelligence Artificielle pour l'orientation professionnelle des diplômés camerounais**
+
+🔗 Application en ligne : [reorient-cm.onrender.com](https://reorient-cm.onrender.com)
 
 ---
 
 ## Présentation
 
-ReOrient CM est une application web bilingue (FR/EN) qui aide les jeunes diplômés camerounais en situation de chômage à construire un plan de reconversion professionnelle personnalisé, ancré dans les réalités du marché camerounais 2026.
+ReOrient CM est une application web qui aide les diplômés camerounais en situation d'inadéquation formation-emploi à construire un plan de reconversion professionnelle personnalisé, ancré dans les réalités du marché camerounais.
+
+L'application repose sur le modèle Claude Sonnet (Anthropic), enrichi par une base de connaissances localisée injectée dans le prompt système à chaque session — couvrant les secteurs formels et informels, les filières universitaires, les structures d'appui (FNE, PAJER-U, APME, GIZ, Orange Digital Centers) et les dix régions du Cameroun.
 
 ### Fonctionnalités
-- Chat IA conversationnel (10 questions d'onboarding)
-- Plan de reconversion en 3 phases (court / moyen / long terme)
-- Base de connaissances : 10 régions, 9 filières, 8 secteurs, 7 structures d'appui
-- Export du plan en JSON et PDF
-- Interface bilingue FR/EN
-- Responsive (desktop + mobile)
+
+- 💬 Chat conversationnel avec mémoire de session complète
+- 🔐 Authentification sécurisée (JWT + hachage SHA-256)
+- ☁️ Sauvegarde et persistance des conversations en base de données
+- 🌙 Mode sombre
+- 🔍 Recherche avec surbrillance dans les conversations
+- 📄 Export du plan de reconversion en PDF
+- ✉️ Réinitialisation de mot de passe par email
 
 ---
 
-## Installation rapide
+## Architecture
+
+Application **three-tier** :
+
+| Couche | Technologie |
+|---|---|
+| Présentation | HTML5, CSS3, JavaScript vanilla (SPA, sans framework) |
+| Logique métier | Python 3.12, FastAPI, Uvicorn (ASGI) |
+| Données | PostgreSQL, SQLAlchemy (ORM) |
+| IA | Claude Sonnet — Anthropic API |
+| Email | Resend API |
+
+Le choix d'un frontend sans framework vise à garantir des temps de chargement rapides sur des connexions à débit limité, contrainte réelle pour une partie des utilisateurs ciblés.
+
+---
+
+## Installation en local
 
 ### Prérequis
-- Python 3.10+
-- VS Code (recommandé)
-- Un navigateur web moderne
+- Python 3.12+
+- Un compte [PostgreSQL](https://www.postgresql.org/) (local ou cloud, ex. Render)
+- Une clé API [Anthropic](https://console.anthropic.com)
+- Une clé API [Resend](https://resend.com) (pour l'envoi d'emails)
 
-### Étape 1 — Cloner / Télécharger le projet
-Placez le dossier `reorient-cm` dans votre espace de travail.
-
-### Étape 2 — Obtenir une clé API Claude (GRATUIT)
-1. Allez sur [console.anthropic.com](https://console.anthropic.com)
-2. Créez un compte gratuit
-3. Allez dans "API Keys" → "Create Key"
-4. Copiez la clé (commence par `sk-ant-...`)
-
-### Étape 3 — Configurer le backend
+### Étape 1 — Cloner le dépôt
 ```bash
-# Entrez dans le dossier backend
+git clone https://github.com/ismailbapes/reorient-cm.git
 cd reorient-cm/backend
-
-# Créez l'environnement virtuel
-python -m venv venv
-
-# Activez-le
-# Sur Windows :
-venv\Scripts\activate
-# Sur Mac/Linux :
-source venv/bin/activate
-
-# Installez les dépendances
-pip install -r requirements.txt
-
-# Créez le fichier .env
-cp .env.example .env
-# Ouvrez .env et remplacez "sk-ant-votre-cle-ici" par votre vraie clé API
 ```
 
-### Étape 4 — Lancer le backend
+### Étape 2 — Configurer l'environnement
 ```bash
-# Depuis le dossier backend, avec le venv activé :
-python main.py
+python3.12 -m venv venv
+source venv/bin/activate      # Windows : venv\Scripts\activate
+
+pip install -r requirements.txt --break-system-packages
 ```
-✅ Le backend est accessible sur : http://localhost:8000
-✅ Documentation API interactive : http://localhost:8000/docs
 
-### Étape 5 — Ouvrir le frontend
-Ouvrez le fichier `frontend/index.html` directement dans votre navigateur.
+### Étape 3 — Variables d'environnement
+Créez un fichier `.env` à la racine du dossier `backend` :
 
-> **Important** : Le backend doit être lancé AVANT d'ouvrir le frontend.
+```env
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+ANTHROPIC_API_KEY=sk-ant-votre-cle-ici
+RESEND_API_KEY=re_votre-cle-ici
+SECRET_KEY=votre-cle-secrete-jwt
+APP_URL=http://localhost:8000
+FROM_EMAIL=onboarding@resend.dev
+```
+
+### Étape 4 — Lancer l'application
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+✅ Application accessible sur : http://localhost:8000
+✅ Documentation API interactive (Swagger) : http://localhost:8000/docs
 
 ---
 
@@ -76,74 +89,54 @@ Ouvrez le fichier `frontend/index.html` directement dans votre navigateur.
 ```
 reorient-cm/
 ├── backend/
-│   ├── main.py                    # Point d'entrée FastAPI
-│   ├── requirements.txt           # Dépendances Python
-│   ├── .env.example               # Template variables d'environnement
-│   └── app/
-│       ├── routers/
-│       │   ├── chat.py            # Endpoints conversation
-│       │   └── plan.py            # Endpoints plan + export
-│       ├── models/
-│       │   └── schemas.py         # Modèles de données Pydantic
-│       ├── services/
-│       │   ├── claude_service.py  # Intégration API Claude
-│       │   └── session_manager.py # Gestion des sessions
-│       └── knowledge/
-│           ├── system_prompt.txt           # Prompt système ReOrient CM
-│           ├── bloc1a_secteurs_formels.json
-│           ├── bloc1b_secteurs_informels.json
-│           ├── bloc2a_filieres.json
-│           ├── bloc3_formations_structures.json
-│           └── bloc4_regions_contraintes.json
-└── frontend/
-    └── index.html                 # Interface web complète (single file)
+│   ├── main.py                     # Point d'entrée FastAPI
+│   ├── requirements.txt            # Dépendances Python
+│   ├── database.py                 # Configuration SQLAlchemy / PostgreSQL
+│   ├── models/                     # Modèles ORM (User, Conversation, Message...)
+│   ├── routers/
+│   │   ├── auth.py                 # Inscription, connexion, JWT
+│   │   ├── chat.py                 # Endpoints de conversation
+│   │   └── password_reset.py       # Réinitialisation de mot de passe
+│   ├── knowledge/                  # Base de connaissances (5 blocs JSON)
+│   │   ├── secteurs_formels.json
+│   │   ├── secteurs_informels.json
+│   │   ├── filieres_universitaires.json
+│   │   ├── structures_appui.json
+│   │   └── regions_cameroun.json
+│   └── static/
+│       └── index.html              # Interface web (SPA)
+└── README.md
 ```
 
 ---
 
-## Déploiement en ligne
+## Déploiement
 
-### Backend → Railway (gratuit)
-1. Créez un compte sur [railway.app](https://railway.app)
-2. "New Project" → "Deploy from GitHub" (uploadez le dossier backend)
-3. Ajoutez la variable d'environnement `ANTHROPIC_API_KEY`
-4. Railway génère une URL publique automatiquement
+L'application est déployée sur **[Render](https://render.com)** :
 
-### Frontend → Vercel (gratuit)
-1. Créez un compte sur [vercel.com](https://vercel.com)
-2. Uploadez le dossier `frontend`
-3. Dans `index.html`, remplacez `http://localhost:8000` par l'URL Railway
-4. Vercel génère une URL publique
+- **Web Service** : build à partir du dossier `backend`, démarré via `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- **PostgreSQL** : base de données managée Render
+- **Variables d'environnement** : `DATABASE_URL`, `ANTHROPIC_API_KEY`, `RESEND_API_KEY`, `SECRET_KEY`, `APP_URL`, `FROM_EMAIL`
+
+⚠️ Le plan gratuit Render met le service en veille après 15 minutes d'inactivité ; le redémarrage prend 30 à 60 secondes.
 
 ---
 
-## Endpoints API
+## Technique : RAG statique (context stuffing)
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/api/session/new` | Créer une nouvelle session |
-| POST | `/api/chat` | Envoyer un message |
-| GET | `/api/session/{id}` | Récupérer les données de session |
-| GET | `/api/plan/{id}` | Récupérer le plan généré |
-| GET | `/api/plan/{id}/export?format=pdf` | Exporter en PDF |
-| GET | `/api/plan/{id}/export?format=json` | Exporter en JSON |
-| GET | `/health` | Vérifier l'état du serveur |
-
----
-
-## Technologies utilisées
-
-- **Backend** : Python 3.10+, FastAPI, Anthropic Claude API
-- **Frontend** : HTML5, CSS3, JavaScript vanilla (pas de framework nécessaire)
-- **IA** : Claude Sonnet (Anthropic) avec prompt engineering avancé
-- **Base de données** : Sessions en mémoire (SQLite possible en extension)
-- **Export** : ReportLab (PDF), JSON natif
+ReOrient CM s'inspire du principe RAG (*Retrieval-Augmented Generation*) sans recherche vectorielle dynamique : les cinq blocs de la base de connaissances sont injectés intégralement dans le prompt système à chaque nouvelle session. Cette approche — plus proche du *context stuffing* — a été retenue car le volume de données reste compatible avec la fenêtre de contexte de Claude Sonnet, évitant une infrastructure de recherche vectorielle disproportionnée par rapport aux besoins actuels du projet.
 
 ---
 
 ## Projet académique
 
-Développé dans le cadre du projet de fin d'études d'ingénieur en génie numérique à l'ESIGN (École Supérieure Internationale de Génie Numérique), Université Inter-Etats Congo-Cameroun (UIECC), Sangmélima, Cameroun — 2026.
+Développé dans le cadre du rapport d'étude technologique pour l'obtention du diplôme d'Ingénieur en Génie Numérique (filière Création et Design Numérique) à l'ESIGN — École Supérieure Internationale de Génie Numérique, Université Inter-États Congo-Cameroun (UIECC), Sangmélima, Cameroun.
+
+**Thème** : *Conception et développement d'un assistant conversationnel basé sur l'Intelligence Artificielle pour l'orientation professionnelle des diplômés camerounais : cas de ReOrient CM*
+
+**Auteur** : NSANG BAPES Cédric Ismail
+**Superviseur** : Dr. ONDOBO Luc
+**Encadreurs** : Dr. ELOUNDOU Telesphore, Dr. EBALA EBALA Hervé
 
 ---
 
